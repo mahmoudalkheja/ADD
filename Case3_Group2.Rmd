@@ -561,7 +561,7 @@ print(fa_pca_8f_n$loadings, cutoff=0.3, sort=TRUE)
 
 -   PA8 -\> 16-19 -\>Professionalism
 
-# Question 1 
+# Question 1
 
 **What are the dimensions by which Galeries Lafayette is perceived? Please explain your findings and rational for your final result.**
 
@@ -601,9 +601,9 @@ Based on these fit measures, we can conclude that our factor analysis was good f
 parameterestimates(fit, boot.ci.type = "bca.simple", standardized = TRUE)%>% kable()
 ```
 
-Wee see that all values are significant.
-By looking at the upper and lower case as seen in class it should not contain 0, the case for all execept IM 1 and Im 7 with themselves.
-Result are nevertheless very good.
+We can observe that all values are significant.
+During class, we learned that upper and lower case should not include 0, except for IM 1 and IM 7 in relation to themselves.
+Despite this exception, the results are still satisfactory.
 
 ```{r}
 #calculating reliability
@@ -612,12 +612,60 @@ CronReli
 
 ```
 
-#### Look at coorrelation Matrix
+```{r}
+#calculating reliability
+CronReli=cronbach(subset(myData, select = c(Im20,Im21,Im22)))
+CronReli
+```
+
+```{r}
+#calculating reliability
+CronReli=cronbach(subset(myData, select = c(Im11,Im12,Im13)))
+CronReli
+```
+
+```{r}
+#calculating reliability
+CronReli=cronbach(subset(myData, select = c(Im1,Im2)))
+CronReli
+```
+
+```{r}
+#calculating reliability
+CronReli=cronbach(subset(myData, select = c(Im10,Im14)))
+CronReli
+```
+
+```{r}
+#calculating reliability
+CronReli=cronbach(subset(myData, select = c(Im6,Im7)))
+CronReli
+```
+
+```{r}
+#calculating reliability
+CronReli=cronbach(subset(myData, select = c(Im17,Im18)))
+CronReli
+```
+
+```{r}
+#calculating reliability
+CronReli=cronbach(subset(myData, select = c(Im16,Im19)))
+CronReli
+```
 
 ```{r}
 std_fit=inspect(fit, "std")
 std_fit$psi
 ```
+```{r}
+std_fit$lambda
+```
+
+```{r}
+std_fit$theta
+```
+
 
 Looking at correlation Matrix we see all are below 0.7 which is good if not we could issues with discriminant validity, but it is not our case (slide 78)
 
