@@ -42,7 +42,7 @@ library(ggcorrplot)
 library(psy)
 ```
 
-```{r}
+```{r,warning=FALSE,message=FALSE}
 setwd("/Users/mahmoudalkheja/Desktop/Advanced Data Driven Decision Making/Case Study III-20230420")
 myData <- read.csv("Case Study III_Structural Equation Modeling.csv")
 explanation <- read.csv("Variables and Labels_Galeries Lafayette.csv")
@@ -56,7 +56,7 @@ myData =data.frame(sapply(myData,function(x) ifelse((x==999),NA,as.numeric(x))))
 
 Change 999 in the Data-set to NA's:
 
-# Exploratory factor analyses
+## Exploratory factor analyses
 
 **Conducting the confirmatory factor analyses run an exploratory factor analyses in R to get an initial idea by which dimensions customers perceive Gallerias Lafayette. In the file all 22 image items are proposed to measure different constructs or perceptual dimensions**
 
@@ -565,6 +565,8 @@ print(fa_pca_8f_n$loadings, cutoff=0.3, sort=TRUE)
 
 **What are the dimensions by which Galeries Lafayette is perceived? Please explain your findings and rational for your final result.**
 
+## **Confirmatory Factor Analysis**
+
 ```{r}
 model <- "
 decoration=~ Im3+Im4+Im5
@@ -654,43 +656,80 @@ CronReli=cronbach(subset(myData, select = c(Im16,Im19)))
 CronReli
 ```
 
+All of Cronbach's alpha greater than 0.7 indicating that the observed variables have sufficient reliability
+
 ```{r}
 std_fit=inspect(fit, "std")
 std_fit$psi
 ```
+
+some comment on covariances include:
+
+-   decoration and professionalism (0.653): This suggests a strong positive relationship between these two factors, meaning that as the decoration quality increases, professionalism is also likely to increase.
+
+-   cuisine and atmosphere (0.295): This suggests a relatively weak positive relationship between these two factors, meaning that the quality of the cuisine is not strongly related to the atmosphere of the establishment.
+
+    \
+
 ```{r}
 std_fit$lambda
 ```
+
+Each construct has loadings greater than 0.7, indicating that at least 50% of the variance in each indicator is explained by the underlying construct.
 
 ```{r}
 std_fit$theta
 ```
 
+From theta matrix we can see that the diagonal values range from 0.040(IM1) to 0.622(Im11).
+Lower values indicate that the latent factors account for a larger proportion of the variance in the observed variables, while higher values suggest that the latent factors explain less of the variance in the observed variables
 
-Looking at correlation Matrix we see all are below 0.7 which is good if not we could issues with discriminant validity, but it is not our case (slide 78)
+```{r}
+modificationindices(fit) %>% filter(mi>10)
+```
 
-# 2. Are the mechanism driving satisfaction and affective commitment similar? Are satisfaction and affective commitment mediating the impact of image perceptions on outcomes? If yes for which outcomes?
+Since we do not have a Large Modification Indices (mi) that indicate that we have a good model.
 
-We need to write the model knowing
+# Question 2 
 
-images --\> mediators --\> outcome
+**Are the mechanism driving satisfaction and affective commitment similar? Are satisfaction and affective commitment mediating the impact of image perceptions on outcomes? If yes for which outcomes?**
 
-Images we have our 8 dimensions found previously.
+To create a structural equation model, we need to consider the relationships between the observed variables and latent variables based on the known structure:
 
-2 mediators --\> Affective Commitment ( with COM_A1 -- COM_A4) Customer Satisfaction ( with SAT_1 -- SAT_3)
+Images → Mediators → Outcomes
 
-2 outcomes --\> Repurchase Intention (with C_REP1-C_REP3 ) CoCreation ( with C_CR1, C.CR3, C.CR4)
+For this model, we have:
 
-Let's write our model:
+1.  Images: The 8 dimensions found previously.
+
+2.  Mediators: Affective Commitment (with COM_A1 -- COM_A4) and Customer Satisfaction (with SAT_1 -- SAT_3).
+
+3.  Outcomes: Repurchase Intention (with C_REP1 -- C_REP3) and Co-creation (with C_CR1, C_CR3, C_CR4).
+
+Now let's define the model:
+
+1.  Images: These are the 8 dimensions we identified earlier, which serve as the predictor variables in our model.
+
+2.  Mediators:
+
+    -   Affective Commitment (AC) =\~ COM_A1 + COM_A2 + COM_A3 + COM_A4
+
+    -   Customer Satisfaction (CS) =\~ SAT_1 + SAT_2 + SAT_3
+
+3.  Outcomes:
+
+    -   Repurchase Intention (RI) =\~ C_REP1 + C_REP2 + C_REP3
+
+    -   Co-creation (CC) =\~ C_CR1 + C_CR3 + C_CR4
 
 ```{r}
 model1 <- "
 # measurement model (=~)
 decoration=~ Im3+Im4+Im5
 atmosphere=~ Im20+Im21+Im22
-luxury=~ Im11+Im12+Im13
+brand=~ Im11+Im12+Im13
 variety=~ Im1 + Im2
-gourmet=~ Im10+ Im14
+cuisine=~ Im10+ Im14
 france=~ Im6 + Im7
 mode=~ Im17 + Im18
 professionalism =~ Im16+ Im19
@@ -704,11 +743,11 @@ professionalism =~ Im16+ Im19
 cocreation ~ a * satisfaction + b * commitment
 repurchase ~ c * satisfaction + d * commitment 
 
-satisfaction ~ e * professionalism + f * mode + g * france + h * gourmet + i * variety + j * luxury + k * atmosphere + l * decoration
-commitment ~ m * professionalism + n * mode + o * france + p * gourmet + q * variety + r * luxury + s * atmosphere + t * decoration
+satisfaction ~ e * professionalism + f * mode + g * france + h * cuisine + i * variety + j * brand + k * atmosphere + l * decoration
+commitment ~ m * professionalism + n * mode + o * france + p * cuisine + q * variety + r * brand + s * atmosphere + t * decoration
 
-cocreation ~ u * professionalism + v * mode + w * france + x * gourmet + y * variety + z * luxury + aa * atmosphere + bb * decoration
-repurchase ~  cc * professionalism + dd * mode + ee * france + ff * gourmet + gg * variety + hh * luxury + ii * atmosphere + jj * decoration
+cocreation ~ u * professionalism + v * mode + w * france + x * cuisine + y * variety + z * brand+ aa * atmosphere + bb * decoration
+repurchase ~  cc * professionalism + dd * mode + ee * france + ff * cuisine + gg * variety + hh * brand + ii * atmosphere + jj * decoration
 
 
 # indirect effect (:=)
