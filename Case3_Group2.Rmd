@@ -39,6 +39,7 @@ library(psych)        # principal axis factoring
 library(naniar)       # for missing values analysis
 library(RColorBrewer)
 library(ggcorrplot)
+library(psy)
 ```
 
 ```{r}
@@ -560,9 +561,9 @@ print(fa_pca_8f_n$loadings, cutoff=0.3, sort=TRUE)
 
 -   PA8 -\> 16-19 -\>Professionalism
 
-end
+# Question 1 
 
-# 1- What are the dimensions by which Galeries Lafayette is perceived? Please explain your findings and rational for your final result.
+**What are the dimensions by which Galeries Lafayette is perceived? Please explain your findings and rational for your final result.**
 
 ```{r}
 model <- "
@@ -575,25 +576,26 @@ france=~ Im6 + Im7
 mode=~ Im17 + Im18
 professionalism =~ Im16+ Im19"
 
-fit <- cfa(model, image[,-c(8,9,15)], missing="ML")
+fit <- cfa(model, myData, missing="ML")
  summary(fit, fit.measures=TRUE,standardized=TRUE)
 ```
 
 ## Results
 
-We will check the fit measure of our model to determine if it a good model or not.
-First global fit measure: From course slide 68 : A low Chi2-value (under consideration of degrees of freedom) indicates a good fit -- ratio Chi2-value/df should be below 5 for samples up to 1000.
-In our case we have 553 observations so we are in this case now we calculate: 259.047/ 124 = 2.089089 We are below 5, so result Chi-squared test √
+To evaluate whether our model is good or not, we will check the fit measures.
+The first global fit measure we will consider is the Chi-squared test.
+According to slide 68 of our course, a low Chi2-value (considering degrees of freedom) indicates a good fit, and the ratio of Chi2-value/df should be below 5 for samples up to 1000.
+Since we have 553 observations, we calculate the ratio as 259.047/124 = 2.089089, which is below 5.
+Therefore, our Chi-squared test result is good.
 
-From course slide 69: We need a RMSEA below 0.05 to have a good model.
-In our case we have 0.044 and robust RMSEA 0.045 we do have a good model then RMSEA √
+Moving on to the second fit measure, according to slide 69 of our course, we need a Root Mean Square Error of Approximation (RMSEA) below 0.05 to have a good model.
+In our case, the RMSEA is 0.044, and the robust RMSEA is 0.045, indicating that we have a good model.
 
-Last to check is the CFI Comparative Fit Index, from slide 70 course we need one above 0.95 to have a good model.
-In our case we have one of 0.982.
-CFI √
+Finally, we will check the Comparative Fit Index (CFI) which is the last fit measure from slide 70 of our course.
+A CFI above 0.95 indicates a good model.
+In our case, we have a CFI of 0.982, which is above the required threshold, indicating a good model.
 
-We know that our global fit measure a good and our model also.
-We then conclude that our factor analysis was good for our model.
+Based on these fit measures, we can conclude that our factor analysis was good for our model.
 
 ```{r}
 parameterestimates(fit, boot.ci.type = "bca.simple", standardized = TRUE)%>% kable()
@@ -602,6 +604,13 @@ parameterestimates(fit, boot.ci.type = "bca.simple", standardized = TRUE)%>% kab
 Wee see that all values are significant.
 By looking at the upper and lower case as seen in class it should not contain 0, the case for all execept IM 1 and Im 7 with themselves.
 Result are nevertheless very good.
+
+```{r}
+#calculating reliability
+CronReli=cronbach(subset(myData, select = c(Im3,Im4,Im5)))
+CronReli
+
+```
 
 #### Look at coorrelation Matrix
 
